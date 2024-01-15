@@ -8,8 +8,9 @@ const crypto = require('crypto');
 
 // Signup
 exports.signup = async (req, res) => {
+  console.log(JSON.parse(Object.keys(req.body)[0]) , typeof Object.keys(req.body)[0] )
   try {
-    const { username, password ,emailId} = req.body;
+    const { username, password ,emailId} = JSON.parse(Object.keys(req.body)[0]);
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
@@ -17,20 +18,21 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
       emailId:emailId
     });
-
-    await newUser.save();
-
-    res.status(201).json({ message: 'User created successfully' });
+    const data = await newUser.save();
+   
+    res.status(200).json({ message: 'User created successfully',status:'200'});
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error creating user' });
   }
 };
 
 // Login
 exports.login = async (req, res) => {
+  
   try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
+    const { emailId, password } =JSON.parse(Object.keys(req.body)[0]);
+    const user = await User.findOne({ emailId });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -56,7 +58,7 @@ exports.login = async (req, res) => {
 // Project
 exports.projects = async (req, res) => {
     try {
-      const { name, phone ,description , emailId ,techStack} = req.body;
+      const { name, phone ,description , emailId ,techStack} = JSON.parse(Object.keys(req.body)[0]);
       const newUser = new Projects({
         name,
         phone: phone,
